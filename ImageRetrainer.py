@@ -20,7 +20,7 @@ second_last_tensor_name = 'pool_3/_reshape:0'
 second_last_tensor_size = 2048
 MAX_NUM_IMAGES_PER_CLASS = 2 ** 27 - 1
 
-num_training_steps = 800
+num_training_steps = 2000
 train_batch_size = 100
 eval_step_interval = 10
 testing_percentage = 20
