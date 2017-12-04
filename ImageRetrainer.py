@@ -91,6 +91,8 @@ class NeuralNetwork(object):
             with tf.name_scope('total'):
                 cross_entropy_mean = tf.reduce_mean(cross_entropy)
         tf.summary.scalar('cross_entropy', cross_entropy_mean)
+        tf.summary.histogram('weights', layer_weights)
+        tf.summary.histogram('biases', layer_biases)
 
         with tf.name_scope('train'):
             optimizer = tf.train.GradientDescentOptimizer(0.01)
@@ -192,9 +194,10 @@ class NeuralNetwork(object):
         resized_input_values = self.session.run(self.decoded_image_tensor, {self.jpeg_data_tensor: image_data})
 
         units = self.session.run(self.layer, {self.input_tensor: resized_input_values})
-        self.plotNNFilter(units)
+        self.plotNNFilterGrid(units)
+        self.plotNNFilters(units)
 
-    def plotNNFilter(self, units):
+    def plotNNFilterGrid(self, units):
         filters = units.shape[3]
         plt.figure(1, figsize=(20,20))
         n_columns = 6
@@ -202,9 +205,22 @@ class NeuralNetwork(object):
 
         for i in range(filters):
             plt.subplot(n_rows, n_columns, i+1)
+            plt.subplots_adjust(hspace=0.35, wspace=0.01)
             plt.title('Filter ' + str(i))
             plt.imshow(units[0,:,:,i], interpolation="nearest", cmap="gray")
-        plt.savefig('myfig.png')
+        plt.savefig('./visualizations/filters.png', bbox_inches='tight')
+        plt.clf()
+
+    def plotNNFilters(self, units):
+        filters = units.shape[3]
+        plt.figure(1, figsize=(20,20))
+
+        for i in range(filters):
+            plt.title('Filter ' + str(i))
+            plt.imshow(units[0,:,:,i], interpolation="nearest", cmap="gray")
+            file_name = './visualizations/filter_' + str(i) + '.png'
+            plt.savefig(file_name, bbox_inches='tight')
+            plt.clf()
 
 '''
 Download and initialize the inception model
