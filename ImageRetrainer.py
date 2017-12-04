@@ -189,15 +189,16 @@ class NeuralNetwork(object):
         return bottleneck_values
 
     def getActivations(self):
-        image_path = self.get_image_path(list(self.images_dict.keys())[0], 0, 'validation')
-        image_data = tf.gfile.FastGFile(image_path, 'rb').read()
-        resized_input_values = self.session.run(self.decoded_image_tensor, {self.jpeg_data_tensor: image_data})
+        for i in range(10):
+            image_path = self.get_image_path(list(self.images_dict.keys())[i], 0, 'validation')
+            image_data = tf.gfile.FastGFile(image_path, 'rb').read()
+            resized_input_values = self.session.run(self.decoded_image_tensor, {self.jpeg_data_tensor: image_data})
 
-        units = self.session.run(self.layer, {self.input_tensor: resized_input_values})
-        self.plotNNFilterGrid(units)
-        self.plotNNFilters(units)
+            units = self.session.run(self.layer, {self.input_tensor: resized_input_values})
+            self.plotNNFilterGrid(units,i)
+            self.plotNNFilters(units,i)
 
-    def plotNNFilterGrid(self, units):
+    def plotNNFilterGrid(self, units, image_num):
         filters = units.shape[3]
         plt.figure(1, figsize=(20,20))
         n_columns = 6
@@ -208,18 +209,30 @@ class NeuralNetwork(object):
             plt.subplots_adjust(hspace=0.35, wspace=0.01)
             plt.title('Filter ' + str(i))
             plt.imshow(units[0,:,:,i], interpolation="nearest", cmap="gray")
-        plt.savefig('./visualizations/filters.png', bbox_inches='tight')
+
+        dir_path = './visualizations/activations_' + str(image_num) + '/'
+        file_name = 'filters.png'
+        full_path = dir_path + file_name
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        plt.savefig(full_path, bbox_inches='tight')
         plt.clf()
 
-    def plotNNFilters(self, units):
+    def plotNNFilters(self, units, image_num):
         filters = units.shape[3]
         plt.figure(1, figsize=(20,20))
 
         for i in range(filters):
             plt.title('Filter ' + str(i))
             plt.imshow(units[0,:,:,i], interpolation="nearest", cmap="gray")
-            file_name = './visualizations/filter_' + str(i) + '.png'
-            plt.savefig(file_name, bbox_inches='tight')
+            dir_path = './visualizations/activations_' + str(image_num) + '/'
+            file_name = 'filter_' + str(i) + '.png'
+            full_path = dir_path + file_name
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+
+            plt.savefig(full_path, bbox_inches='tight')
             plt.clf()
 
 '''
